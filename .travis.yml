@@ -1,0 +1,13 @@
+language: node_js
+node_js:
+  - '6.10.3'
+sudo: false
+cache: yarn
+env:
+  - TEST_DIR=api
+before_install:
+  - cd $TEST_DIR
+install:
+  - yarn install
+script:
+  - yarn build
