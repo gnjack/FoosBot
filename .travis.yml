@@ -8,6 +8,6 @@ env:
 before_install:
   - cd $TEST_DIR
 install:
-  - yarn install
+  - yarn --ignore-engines install
 script:
   - yarn build
