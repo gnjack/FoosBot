@@ -1,0 +1,19 @@
+{
+  "TableName": "foosbot-test-installations",
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "oauthId",
+      "AttributeType": "S"
+    }
+  ],
+  "KeySchema": [
+    {
+      "AttributeName": "oauthId",
+      "KeyType": "HASH"
+    }
+  ],
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 1,
+    "WriteCapacityUnits": 1
+  }
+}

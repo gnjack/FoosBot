@@ -1,0 +1,68 @@
+{
+  "name": "foosbot-interactive",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "lint": "standard --verbose src/**/*.js | snazzy",
+    "test": "babel-tape-runner src/**/*.test.js | tap-spec",
+    "clean": "rimraf dist/*",
+    "compile": "babel src --out-dir dist --ignore **/*.test.js,**/test/**",
+    "build": "npm run lint && npm test && npm run clean && npm run compile",
+    "createaws": "claudia create --name foosbot-interactive --region eu-west-1 --timeout 30 --api-module dist/main --policies policies --version stable --set-env-from-json stable-env.json",
+    "destroy": "claudia destroy",
+    "deploy": "claudia update --set-env-from-json test-env.json",
+    "promote": "claudia set-version --version stable --set-env-from-json stable-env.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.24.0",
+    "babel-polyfill": "^6.22.0",
+    "claudia-api-builder": "^2.4.0",
+    "jsonwebtoken": "^7.3.0",
+    "jstrueskill": "https://github.com/racingjellyfish/JsTrueSkill.git",
+    "latinize": "^0.4.0",
+    "moment": "^2.20.1",
+    "node-fetch": "^1.7.1",
+    "sugar-date": "^2.0.4"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.23.0",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-env": "^1.1.10",
+    "babel-tape-runner": "^2.0.1",
+    "claudia": "^2.10.0",
+    "extend-tape": "^1.2.0",
+    "rimraf": "^2.6.1",
+    "sinon": "^2.1.0",
+    "snazzy": "^7.0.0",
+    "standard": "^10.0.2",
+    "tap-spec": "^4.1.1",
+    "tape-async": "^2.3.0"
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "node": 6.9
+          }
+        }
+      ]
+    ],
+    "plugins": [
+      [
+        "transform-object-rest-spread",
+        {
+          "useBuiltIns": true
+        }
+      ]
+    ],
+    "sourceMaps": true,
+    "retainLines": true
+  }
+}

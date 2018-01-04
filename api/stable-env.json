@@ -1,0 +1,8 @@
+{
+  "dynamoDBRegion": "eu-west-1",
+  "installationsTableName": "foosbot-installations",
+  "matchHistoryTableName": "foosbot-match-history",
+  "addonName": "FoosBot",
+  "addonKey": "nvm.foosbot",
+  "maintainers": "@Tench"
+}

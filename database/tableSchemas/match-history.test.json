@@ -1,0 +1,49 @@
+{
+  "TableName": "foosbot-test-match-history",
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "id",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "roomId",
+      "AttributeType": "N"
+    },
+    {
+      "AttributeName": "time",
+      "AttributeType": "N"
+    }
+  ],
+  "KeySchema": [
+    {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+    }
+  ],
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 1,
+    "WriteCapacityUnits": 1
+  },
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "roomId",
+      "KeySchema": [
+        {
+          "AttributeName": "roomId",
+          "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "time",
+          "KeyType": "RANGE"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "ALL"
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 2,
+        "WriteCapacityUnits": 1
+      }
+    }
+  ]
+}
