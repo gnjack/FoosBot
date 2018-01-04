@@ -1,5 +1,6 @@
 import MembershipHandler from './MembershipHandler'
 import MatchHandler from './MatchHandler'
+import StatsHandler from './StatsHandler'
 import HelpHandler from './HelpHandler'
 import notification from '../notificationBuilder'
 
@@ -24,6 +25,8 @@ export default class MessageHandler {
       return new HelpHandler(this._db)
     } else if (isMatch(/^(add|remove|list|leaderboard|league)\b/i)) {
       return new MembershipHandler(this._db)
+    } else if (isMatch(/\b(stats)\b/i)) {
+      return new StatsHandler(this._db)
     } else if (isMatch(/\b(cancel|versus|vs?\.?|red|blue|\d+\D+\b\d+)\b/i)) {
       return new MatchHandler(this._db)
     }

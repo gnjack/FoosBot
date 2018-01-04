@@ -5,12 +5,14 @@ export default class Player extends TSPlayer {
   constructor (name, rating) {
     super(name)
     this._rating = rating
-    this.flawlessVictories = 0
-    this.flawlessDefeats = 0
     this.matches = 0
     this.won = 0
     this.lost = 0
     this.streak = 0
+    this.bestStreak = 0
+    this.worstStreak = 0
+    this.flawlessVictories = 0
+    this.flawlessDefeats = 0
   }
 
   get rating () {
@@ -45,9 +47,11 @@ export default class Player extends TSPlayer {
     if (myScore > oppScore) {
       this.won ++
       this.streak = Math.max(1, this.streak + 1)
+      this.bestStreak = Math.max(this.bestStreak, this.streak)
     } else if (oppScore > myScore) {
       this.lost ++
       this.streak = Math.min(-1, this.streak - 1)
+      this.worstStreak = Math.min(this.worstStreak, this.streak)
     }
   }
 
@@ -59,8 +63,8 @@ export default class Player extends TSPlayer {
     return `${antiXSS(this.getId())} - skill level ${this.getRatingString()} (${this.getRatingDeltaString()}) ranked ${this.getRankString()} (${this.getRankDeltaString()})`
   }
 
-  getRatingString () {
-    return this._rating.conservativeRating.toFixed(1)
+  getRatingString (precision = 1) {
+    return this._rating.conservativeRating.toFixed(precision)
   }
 
   getRatingDeltaString () {
@@ -75,6 +79,10 @@ export default class Player extends TSPlayer {
   getRankDeltaString () {
     const delta = this._prevRank ? this._prevRank - this._rank : 0
     return (delta < 0 ? '' : '+') + delta
+  }
+
+  getNormalDistributionString () {
+    return `(μ ${this._rating.getMean().toFixed(1)}, σ ${this._rating.getStandardDeviation().toFixed(1)})`
   }
 }
 
