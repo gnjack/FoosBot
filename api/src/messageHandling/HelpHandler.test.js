@@ -43,14 +43,15 @@ for (const command of ['help', 'hi @FoosBot']) {
     body.item.message.message = command
 
     const response = await messageHandler.handle(installation, body)
-    var expected = `Hey My, here's what I understand: <ul>`
-    expected += `<li><b>help</b></li>`
-    expected += `<li><b>add <i>[competitor]</i></b></li>`
-    expected += `<li><b>list</b> - leaderboard of competitors and their current skill level</li>`
-    expected += `<li><b><i>[red team]</i> vs <i>[blue team]</i></b> - start a new match</li>`
-    expected += `<li><b>red <i>[score]</i> blue <i>[score]</i></b> - record the results of current match</li>`
-    expected += `<li><b>cancel</b> - cancel current match</li>`
-    expected += `</ul>`
+    var expected = `Hey My, here's what I understand: <ul>
+<li><b>help</b></li>
+<li><b>add <i>[competitor]</i></b></li>
+<li><b>list</b> - leaderboard of competitors and their current skill level</li>
+<li><b><i>[red team]</i> vs <i>[blue team]</i></b> - start a new match</li>
+<li><b>red <i>[score]</i> blue <i>[score]</i></b> - record the results of current match</li>
+<li><b>cancel</b> - cancel current match</li>
+<li><b><i>[competitor]</i> stats</b> - show detailed stats for a player</li>
+</ul>`
     t.htmlResponse(response, expected)
     t.end()
   })
