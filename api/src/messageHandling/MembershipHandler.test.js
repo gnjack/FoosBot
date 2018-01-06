@@ -1,6 +1,7 @@
 import test from '../test'
 import sinon from 'sinon'
 import MessageHandler from '.'
+import moment from 'moment'
 
 const installationsTableName = process.env.installationsTableName = 'installationsTableName'
 const matchHistoryTableName = process.env.matchHistoryTableName = 'matchHistoryTableName'
@@ -153,9 +154,9 @@ test('MembershipHandler # list all members', async t => {
   body.item.message.message = 'LIST'
   const dbMatches = {
     Items: [
-      { id: 'match#1', teams: [['<xss>'], ['a']], scores: [10, 0] },
-      { id: 'match#1', teams: [['<xss>'], ['a']], scores: [10, 0] },
-      { id: 'match#2', teams: [['<xss>'], ['a']] }
+      { id: 'match#1', teams: [['<xss>'], ['a']], scores: [10, 0], time: moment().unix() },
+      { id: 'match#2', teams: [['<xss>'], ['a']], scores: [10, 0], time: moment().unix() },
+      { id: 'match#3', teams: [['<xss>'], ['a']] }
     ]
   }
   db.query.withArgs(sinon.match({ TableName: matchHistoryTableName })).returns({ promise: () => dbMatches })
@@ -164,6 +165,26 @@ test('MembershipHandler # list all members', async t => {
 
   t.notCalled(db.update)
   t.htmlResponse(response, `Table football leaderboard, sorted by skill level: <ol><li>&lt;XSS&gt; (11.7) 🔥🔥</li><li>B (0.0)</li><li>A (-0.8) 💩💩</li></ol>`)
+  t.end()
+})
+
+test('MembershipHandler # list all members within last 30 days', async t => {
+  setupHandler()
+  installation.rooms[roomId] = { members: { '<xss>': '<XSS>', a: 'A', b: 'B' } }
+  body.item.message.message = 'LIST 30'
+  const dbMatches = {
+    Items: [
+      { id: 'match#1', teams: [['<xss>'], ['a']], scores: [10, 0], time: moment().unix() },
+      { id: 'match#2', teams: [['<xss>'], ['a']], scores: [10, 0], time: moment().subtract(32, 'Days').unix() },
+      { id: 'match#3', teams: [['<xss>'], ['a']] }
+    ]
+  }
+  db.query.withArgs(sinon.match({ TableName: matchHistoryTableName })).returns({ promise: () => dbMatches })
+
+  const response = await messageHandler.handle(installation, body)
+
+  t.notCalled(db.update)
+  t.htmlResponse(response, `Table football leaderboard, sorted by skill level for the last 30 days: <ol><li>&lt;XSS&gt; (7.9) 🔥</li><li>B (0.0)</li><li>A (-0.9) 💩</li></ol>`)
   t.end()
 })
 

@@ -1,3 +1,4 @@
+import moment from 'moment'
 import latinize from 'latinize'
 import notification from '../notificationBuilder'
 import CreateRoomCommand from '../db/rooms/CreateRoom'
@@ -22,7 +23,7 @@ export default class MembershipHandler {
       case 'list':
       case 'leaderboard':
       case 'league':
-        return this._list(room, body)
+        return this._list(room, body, match[3] ? match[3] : null)
       default:
         throw new Error(`MembershipHandler received non-matching message '${message.message}'`)
     }
@@ -46,15 +47,20 @@ export default class MembershipHandler {
     return notification.yellow.text(`Sorry, I don't know how to remove competitors from the league yet. Why would anyone want to stop playing foosball anyway?`)
   }
 
-  async _list (room, body) {
+  async _list (room, body, numberDays) {
     if (room && room.members && Object.keys(room.members).length > 0) {
       const league = new League(room.members)
       const roomId = body.item.room.id
-      const matches = await new QueryMatchesCommand(this._db).execute({ roomId })
+      var leagueDays = ''
+      var matches = await new QueryMatchesCommand(this._db).execute({ roomId })
+      if (numberDays && parseInt(numberDays)) {
+        leagueDays = ` for the last ${numberDays} days`
+        matches = matches.filter(match => match.time > moment().subtract(numberDays, 'Days'))
+      }
       league.runLeague(matches)
       const listItems = league.leaderboard.map(p => p.getLeaderboardString()).join('</li><li>')
       const list = `<ol><li>${listItems}</li></ol>`
-      return notification.gray.html(`Table football leaderboard, sorted by skill level: ` + list)
+      return notification.gray.html(`Table football leaderboard, sorted by skill level${leagueDays}: ${list}`)
     } else {
       return notification.yellow.text(`There is no foosball league running in this room!`)
     }
