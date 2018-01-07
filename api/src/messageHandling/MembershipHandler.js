@@ -58,9 +58,11 @@ export default class MembershipHandler {
         matches = matches.filter(match => match.time > moment().subtract(numberDays, 'Days'))
       }
       league.runLeague(matches)
-      const listItems = league.leaderboard.map(p => p.getLeaderboardString()).join('</li><li>')
+      const listItems = league.leaderboard.filter(p => p.played > 0).map(p => p.getLeaderboardString()).join('</li><li>')
       const list = `<ol><li>${listItems}</li></ol>`
-      return notification.gray.html(`Table football leaderboard, sorted by skill level${leagueDays}: ${list}`)
+      const notPlayed = league.leaderboard.filter(p => p.played === 0).map(p => p.getLeaderboardString(false)).join('</li><li>')
+      const notPlayedList = notPlayed ? `</br>The following players have not played a game: <ol><li>${notPlayed}</li></ol>` : ''
+      return notification.gray.html(`Table football leaderboard, sorted by skill level${leagueDays}: ${list}${notPlayedList}`)
     } else {
       return notification.yellow.text(`There is no foosball league running in this room!`)
     }
