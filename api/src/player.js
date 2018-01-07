@@ -15,6 +15,10 @@ export default class Player extends TSPlayer {
     this.flawlessDefeats = 0
   }
 
+  get played () {
+    return this.won + this.lost
+  }
+
   get rating () {
     return this._rating
   }
@@ -55,8 +59,11 @@ export default class Player extends TSPlayer {
     }
   }
 
-  getLeaderboardString () {
-    return `${antiXSS(this.getId())} (${this.getRatingString()})${this.flawlessVictories ? ' ' + '🔥'.repeat(this.flawlessVictories) : ''}${this.flawlessDefeats ? ' ' + '💩'.repeat(this.flawlessDefeats) : ''}`
+  getLeaderboardString (includeRating = true) {
+    if (includeRating) {
+      return `${antiXSS(this.getId())} (${this.getRatingString()})${this.flawlessVictories ? ' ' + '🔥'.repeat(this.flawlessVictories) : ''}${this.flawlessDefeats ? ' ' + '💩'.repeat(this.flawlessDefeats) : ''}`
+    }
+    return `${antiXSS(this.getId())}`
   }
 
   getPostMatchString () {
