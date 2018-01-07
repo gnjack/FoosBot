@@ -10,22 +10,22 @@ export default class MatchHandler {
   }
 
   async handle ({installation, body, message}) {
-    const room = installation.rooms[body.item.room.id]
+    const roomId = body.item.room.id
+    const room = installation.rooms[roomId]
+    const members = (room && room.members) || {}
 
     const name = message.message.split('stats').map(s => s.trim()).filter(s => s).join('')
-    return this._playerStats(room, body, normalizeName(name, message))
+    return this._playerStats(roomId, members, normalizeName(name, message))
   }
 
-  async _playerStats (room, body, playerName) {
-    const members = (room && room.members) || {}
+  async _playerStats (roomId, members, playerName) {
     if (!nameKnown(playerName, members)) {
       return notification.yellow.text(`Sorry, I don't know who ${playerName} is.`)
     }
 
-    const roomId = body.item.room.id
     const matches = await new QueryMatchesCommand(this._db).execute({ roomId })
 
-    const league = new League(room.members)
+    const league = new League(members)
     league.runLeague(matches)
 
     const player = league.players[playerName]

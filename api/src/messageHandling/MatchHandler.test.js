@@ -7,6 +7,7 @@ const roomId = 12321
 let db, messageHandler, installation, body
 
 function setupHandler () {
+  process.env.addonName = 'FoosBot'
   installation = {
     oauthId: 'oauthId',
     oauthSecret: 'oauthSecret',
@@ -27,10 +28,24 @@ function setupHandler () {
   db = {
     query: sinon.stub().returns({ promise: () => { return { Items: [] } } }),
     update: sinon.stub().returns({ promise: () => {} }),
-    put: sinon.stub().returns({ promise: () => {} })
+    put: sinon.stub().returns({ promise: () => {} }),
+    delete: sinon.stub().returns({ promise: () => {} })
   }
   messageHandler = new MessageHandler(db)
 }
+
+test('MatchHandler # unknown names ', async t => {
+  setupHandler()
+  installation.rooms[roomId] = { members: { '<xss>': '<XSS>', a: 'A', b: 'B' } }
+  body.item.message.mentions = [{mention_name: 'amention', name: 'A'}, {mention_name: 'unknown', name: 'Unknown Mention'}]
+  body.item.message.message = '@amention @unknown vs b and Unknown Player'
+
+  const response = await messageHandler.handle(installation, body)
+
+  t.notCalled(db.put)
+  t.textResponse(response, `Sorry, I don't know who 'Unknown Mention' or 'Unknown Player' are. If you want to add them, say '@FoosBot add Unknown Mention, Unknown Player'.`)
+  t.end()
+})
 
 test('MatchHandler # start 1 v 1 match ', async t => {
   setupHandler()
@@ -79,6 +94,24 @@ test('MatchHandler # start 3 v 2 match ', async t => {
     }
   })
   t.textResponse(response, `Match started! Red - <XSS> (7.9), A (-0.9) and B (0.0) VS Blue - C (0.0) and D (0.0). Match Quality: 21%`)
+  t.end()
+})
+
+test('MatchHandler # start fails with matches already progress', async t => {
+  setupHandler()
+  installation.rooms[roomId] = { members: { '<xss>': '<XSS>', a: 'A', b: 'B' } }
+  body.item.message.message = 'a vs b'
+  const dbMatches = {
+    Items: [
+      { id: 'match#1', teams: [['a'], ['b']] }
+    ]
+  }
+  db.query.withArgs(sinon.match({ TableName: matchHistoryTableName })).returns({ promise: () => dbMatches })
+
+  const response = await messageHandler.handle(installation, body)
+
+  t.notCalled(db.update)
+  t.textResponse(response, `Sorry, a match is already in progess. Either cancel it by saying '@FoosBot cancel' or report the results using '@FoosBot red 5 blue 10' or '@FoosBot 5 10'.`)
   t.end()
 })
 
@@ -164,6 +197,32 @@ test('MatchHandler # add results - first match', async t => {
   t.end()
 })
 
+test('MatchHandler # adding results when no match in progress updates previous match', async t => {
+  setupHandler()
+  installation.rooms[roomId] = { members: { '<xss>': '<XSS>', a: 'A', b: 'B' } }
+  body.item.message.message = '10 9'
+  const dbMatches = {
+    Items: [
+      { id: 'match#1', teams: [['a'], ['b']], scores: [5, 10] }
+    ]
+  }
+  db.query.withArgs(sinon.match({ TableName: matchHistoryTableName })).returns({ promise: () => dbMatches })
+
+  const response = await messageHandler.handle(installation, body)
+
+  t.calledWithExactly(db.update, {
+    TableName: matchHistoryTableName,
+    Key: { id: 'match#1' },
+    UpdateExpression: 'SET teams = :t, scores = :s',
+    ExpressionAttributeValues: {
+      ':t': [['a'], ['b']],
+      ':s': [10, 9]
+    }
+  })
+  t.htmlResponse(response, `Congratulations A! Let's see how that changes your stats: <ul><li>A - skill level 7.9 (+7.9) ranked 1st (+0)</li><li>B - skill level -0.9 (-0.9) ranked 3rd (+0)</li></ul>`)
+  t.end()
+})
+
 test('MatchHandler # add results - 3 v 2', async t => {
   setupHandler()
   installation.rooms[roomId] = { members: { '<xss>': '<XSS>', a: 'A', b: 'B', c: 'C', d: 'D' } }
@@ -187,5 +246,44 @@ test('MatchHandler # add results - 3 v 2', async t => {
     }
   })
   t.htmlResponse(response, `Congratulations Red team! Let's see how that changes your stats: <ul><li>&lt;XSS&gt; - skill level 1.4 (+1.4) ranked 1st (+0)</li><li>A - skill level 1.4 (+1.4) ranked 2nd (+0)</li><li>B - skill level 1.4 (+1.4) ranked 3rd (+0)</li><li>C - skill level -0.1 (-0.1) ranked 4th (+0)</li><li>D - skill level -0.1 (-0.1) ranked 5th (+0)</li></ul>`)
+  t.end()
+})
+
+test('MatchHandler # cancel match in progress', async t => {
+  setupHandler()
+  installation.rooms[roomId] = { members: { '<xss>': '<XSS>', a: 'A', b: 'B' } }
+  body.item.message.message = 'cancel'
+  const dbMatches = {
+    Items: [
+      { id: 'match#1', teams: [['a'], ['b']] }
+    ]
+  }
+  db.query.withArgs(sinon.match({ TableName: matchHistoryTableName })).returns({ promise: () => dbMatches })
+
+  const response = await messageHandler.handle(installation, body)
+
+  t.calledWithExactly(db.delete, {
+    TableName: matchHistoryTableName,
+    Key: { id: 'match#1' }
+  })
+  t.htmlResponse(response, `Canceled current match`)
+  t.end()
+})
+
+test('MatchHandler # cancel fails with no matches in progress', async t => {
+  setupHandler()
+  installation.rooms[roomId] = { members: { '<xss>': '<XSS>', a: 'A', b: 'B' } }
+  body.item.message.message = 'cancel'
+  const dbMatches = {
+    Items: [
+      { id: 'match#1', teams: [['a'], ['b']], scores: [10, 5] }
+    ]
+  }
+  db.query.withArgs(sinon.match({ TableName: matchHistoryTableName })).returns({ promise: () => dbMatches })
+
+  const response = await messageHandler.handle(installation, body)
+
+  t.notCalled(db.delete)
+  t.textResponse(response, `Sorry, no match is in progress to cancel. Start one by saying '@FoosBot @RedPlayer vs @BluePlayer'.`)
   t.end()
 })
