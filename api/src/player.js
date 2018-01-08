@@ -59,6 +59,17 @@ export default class Player extends TSPlayer {
     }
   }
 
+  getNotableEvents () {
+    const events = []
+    if (this.streak > 2 && this.streak >= this.bestStreak) {
+      events.push(`${antiXSS(this.getId())} is on a personal best win streak of ${this.streak} matches in a row!`)
+    }
+    if (this.streak < -2 && this.streak <= this.worstStreak) {
+      events.push(`${antiXSS(this.getId())} is on a personal low, losing ${-this.streak} matches in a row`)
+    }
+    return events
+  }
+
   getLeaderboardString (includeRating = true) {
     if (includeRating) {
       return `${antiXSS(this.getId())} (${this.getRatingString()})${this.flawlessVictories ? ' ' + '🔥'.repeat(this.flawlessVictories) : ''}${this.flawlessDefeats ? ' ' + '💩'.repeat(this.flawlessDefeats) : ''}`

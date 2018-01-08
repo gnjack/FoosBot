@@ -112,7 +112,8 @@ export default class MatchHandler {
     const greeting = lastMatch.scores[0] === lastMatch.scores[1]
       ? '(wow) A draw!?!?'
       : `Congratulations ${lastMatch.scores[0] > lastMatch.scores[1] ? getTeamName('Red', redTeam) : getTeamName('Blue', blueTeam)}!`
-    return notification.green.html(`${greeting} Let's see how that changes your stats: ${list}`)
+    const notableEvents = [].concat(...lastPlayers.map(p => p.getNotableEvents())).join('<br>')
+    return notification.green.html(`${greeting} Let's see how that changes your stats: ${list}${notableEvents}`)
   }
 }
 

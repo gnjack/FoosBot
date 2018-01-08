@@ -123,7 +123,9 @@ for (const command of ['5 10', '5 - 10', 'red 5 blue 10', 'blue 10 red 5']) {
     const dbMatches = {
       Items: [
         { id: 'match#1', teams: [['<xss>'], ['a']], scores: [10, 5] },
-        { id: 'match#2', teams: [['a'], ['b']] }
+        { id: 'match#2', teams: [['a'], ['b']], scores: [5, 10] },
+        { id: 'match#3', teams: [['a'], ['b']], scores: [5, 10] },
+        { id: 'match#4', teams: [['a'], ['b']] }
       ]
     }
     db.query.withArgs(sinon.match({ TableName: matchHistoryTableName })).returns({ promise: () => dbMatches })
@@ -132,14 +134,17 @@ for (const command of ['5 10', '5 - 10', 'red 5 blue 10', 'blue 10 red 5']) {
 
     t.calledWithExactly(db.update, {
       TableName: matchHistoryTableName,
-      Key: { id: 'match#2' },
+      Key: { id: 'match#4' },
       UpdateExpression: 'SET teams = :t, scores = :s',
       ExpressionAttributeValues: {
         ':t': [['a'], ['b']],
         ':s': [5, 10]
       }
     })
-    t.htmlResponse(response, `Congratulations B! Let's see how that changes your stats: <ul><li>A Name - skill level -1.3 (-0.4) ranked 3rd (+0)</li><li>B Name - skill level 6.9 (+6.9) ranked 2nd (+0)</li></ul>`)
+    let expected = `Congratulations B! Let's see how that changes your stats: `
+    expected += `<ul><li>A Name - skill level -1.1 (+0.2) ranked 3rd (+0)</li><li>B Name - skill level 12.5 (+2.2) ranked 1st (+0)</li></ul>`
+    expected += `A Name is on a personal low, losing 4 matches in a row<br>B Name is on a personal best win streak of 3 matches in a row!`
+    t.htmlResponse(response, expected)
     t.end()
   })
 }
