@@ -172,7 +172,10 @@ test('MatchHandler # add results - zero red team score', async t => {
       ':s': [0, 10]
     }
   })
-  t.htmlResponse(response, `Congratulations &lt;XSS&gt;! Let's see how that changes your stats: <ul><li>B - skill level -1.6 (-1.6) ranked 3rd (-1)</li><li>&lt;XSS&gt; - skill level 6.3 (+7.2) ranked 2nd (+1)</li></ul>`)
+  let expected = `Congratulations &lt;XSS&gt;! Let's see how that changes your stats: `
+  expected += `<ul><li>B - skill level -1.6 (-1.6) ranked 3rd (-1)</li><li>&lt;XSS&gt; - skill level 6.3 (+7.2) ranked 2nd (+1)</li></ul>`
+  expected += `B falls from 2nd place on the podium to 3rd, allowing &lt;XSS&gt; to climb to 2nd<br>&lt;XSS&gt; rises to 2nd place, stealing the spot from B`
+  t.htmlResponse(response, expected)
   t.end()
 })
 

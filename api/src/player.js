@@ -59,13 +59,19 @@ export default class Player extends TSPlayer {
     }
   }
 
-  getNotableEvents () {
+  getNotableEvents (league) {
     const events = []
     if (this.streak > 2 && this.streak >= this.bestStreak) {
       events.push(`${antiXSS(this.getId())} is on a personal best win streak of ${this.streak} matches in a row!`)
     }
     if (this.streak < -2 && this.streak <= this.worstStreak) {
       events.push(`${antiXSS(this.getId())} is on a personal low, losing ${-this.streak} matches in a row`)
+    }
+    if (this._rank < this._prevRank) {
+      events.push(`${antiXSS(this.getId())} rises to ${getOrdinal(this._rank)} place, stealing the spot from ${antiXSS(league.leaderboard[this._prevRank - 1].getId())}`)
+    }
+    if (this._prevRank && this._prevRank <= 3 && this._rank > this._prevRank) {
+      events.push(`${antiXSS(this.getId())} falls from ${getOrdinal(this._prevRank)} place on the podium to ${getOrdinal(this._rank)}, allowing ${antiXSS(league.leaderboard[this._prevRank - 1].getId())} to climb to ${getOrdinal(this._prevRank)}`)
     }
     return events
   }
