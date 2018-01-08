@@ -115,7 +115,7 @@ test('MatchHandler # start fails with matches already progress', async t => {
   t.end()
 })
 
-for (const command of ['5 10', 'red 5 blue 10', 'blue 10 red 5']) {
+for (const command of ['5 10', '5 - 10', 'red 5 blue 10', 'blue 10 red 5']) {
   test('MatchHandler # add results ' + command, async t => {
     setupHandler()
     installation.rooms[roomId] = { members: { '<xss>': '<XSS>', a: 'A Name', b: 'B Name' } }
@@ -248,6 +248,36 @@ test('MatchHandler # add results - 3 v 2', async t => {
   t.htmlResponse(response, `Congratulations Red team! Let's see how that changes your stats: <ul><li>&lt;XSS&gt; - skill level 1.4 (+1.4) ranked 1st (+0)</li><li>A - skill level 1.4 (+1.4) ranked 2nd (+0)</li><li>B - skill level 1.4 (+1.4) ranked 3rd (+0)</li><li>C - skill level -0.1 (-0.1) ranked 4th (+0)</li><li>D - skill level -0.1 (-0.1) ranked 5th (+0)</li></ul>`)
   t.end()
 })
+
+for (const command of ['@red vs @blue 5 10', 'Red Player v Blue Player blue 10 red 5']) {
+  test('MatchHandler # add match with results ' + command, async t => {
+    setupHandler()
+    installation.rooms[roomId] = { members: { '<xss>': '<XSS>', 'red player': 'Red Player', 'blue player': 'Blue Player' } }
+    body.item.message.mentions = [{ mention_name: 'red', name: 'Red Player' }, { mention_name: 'blue', name: 'Blue Player' }]
+    body.item.message.message = command
+    const dbMatches = {
+      Items: [
+        { id: 'match#1', teams: [['<xss>'], ['red player']], scores: [10, 5] }
+      ]
+    }
+    db.query.withArgs(sinon.match({ TableName: matchHistoryTableName })).returns({ promise: () => dbMatches })
+
+    const response = await messageHandler.handle(installation, body)
+
+    t.calledWithMatch(db.put, {
+      TableName: matchHistoryTableName,
+      Item: {
+        roomId,
+        teams: [['red player'], ['blue player']],
+        scores: [5, 10]
+      }
+    })
+    t.notCalled(db.update)
+    // t.textResponse(response, `Match started! Red - Red Player (-0.9) VS Blue - Blue Player (0.0). Match Quality: 44%`)
+    t.htmlResponse(response, `Congratulations Blue! Let's see how that changes your stats: <ul><li>Red Player - skill level -1.3 (-0.4) ranked 3rd (+0)</li><li>Blue Player - skill level 6.9 (+6.9) ranked 2nd (+0)</li></ul>`)
+    t.end()
+  })
+}
 
 test('MatchHandler # cancel match in progress', async t => {
   setupHandler()

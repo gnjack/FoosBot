@@ -17,8 +17,20 @@ export default class MatchHandler {
     const roomId = body.item.room.id
     const room = installation.rooms[body.item.room.id]
     const members = (room && room.members) || {}
+    const vsRegex = /^(.*) (?:versus|vs?\.?) (.*)/i
 
-    const vsMatch = message.message.match(/(.*) (?:versus|vs?\.?) (.*)/i)
+    const resultMatch = message.message.match(/(?:^| )(?:(?:red\s*)?(\d+)[\s-]+)?(?:blue\s*)?(\d+)(?:[\s-]+(?:red\s*)?(\d+))?$/i)
+    if (resultMatch) {
+      const scores = [parseInt(resultMatch[1]) || parseInt(resultMatch[3]) || 0, parseInt(resultMatch[2])]
+      const vsMatch = message.message.replace(resultMatch[0], '').match(vsRegex)
+      if (vsMatch) {
+        return this._start(roomId, members, message, vsMatch[1], vsMatch[2], scores)
+      } else {
+        return this._result(roomId, members, scores)
+      }
+    }
+
+    const vsMatch = message.message.match(vsRegex)
     if (vsMatch) {
       return this._start(roomId, members, message, vsMatch[1], vsMatch[2])
     }
@@ -27,15 +39,10 @@ export default class MatchHandler {
       return this._cancel(roomId)
     }
 
-    const resultMatch = message.message.match(/^(?:(?:red\D*)?(\d+)\D+)?(?:blue\D*)?(\d+)(?:\D+(?:red\D*)?(\d+))?$/i)
-    if (resultMatch) {
-      return this._result(roomId, members, parseInt(resultMatch[1]) || parseInt(resultMatch[3]) || 0, parseInt(resultMatch[2]))
-    }
-
     throw new Error(`MatchHandler received non-matching message '${message.message}'`)
   }
 
-  async _start (roomId, members, message, redTeamText, blueTeamText) {
+  async _start (roomId, members, message, redTeamText, blueTeamText, scores) {
     const red = findKnownNames(redTeamText, members, message)
     const blue = findKnownNames(blueTeamText, members, message)
 
@@ -50,14 +57,20 @@ export default class MatchHandler {
       return notification.yellow.text(`Sorry, a match is already in progess. Either cancel it by saying '@${process.env.addonName} cancel' or report the results using '@${process.env.addonName} red 5 blue 10' or '@${process.env.addonName} 5 10'.`)
     }
 
+    const match = {
+      roomId,
+      teams: [red.knownNames, blue.knownNames],
+      scores: scores
+    }
+    matches.push(match)
+    await new SaveMatchCommand(this._db).execute(match)
+
     const league = new League(members)
     league.runLeague(matches)
 
-    const match = {
-      roomId,
-      teams: [red.knownNames, blue.knownNames]
+    if (scores) {
+      return this._resultNotification(league, match)
     }
-    await new SaveMatchCommand(this._db).execute(match)
 
     const quality = league.calculateMatchQuality(match)
     const redTeamString = and(red.knownNames.map(s => `${members[s]} (${league.players[s].getRatingString()})`))
@@ -77,24 +90,28 @@ export default class MatchHandler {
     return notification.green.html(`Canceled current match`)
   }
 
-  async _result (roomId, members, redScore, blueScore) {
+  async _result (roomId, members, scores) {
     const matches = await new QueryMatchesCommand(this._db).execute({ roomId })
     const lastMatch = matches[matches.length - 1]
-    lastMatch.scores = [redScore, blueScore]
+    lastMatch.scores = scores
 
     await new UpdateMatchCommand(this._db).execute(lastMatch)
 
     const league = new League(members)
     league.runLeague(matches)
 
+    return this._resultNotification(league, lastMatch)
+  }
+
+  _resultNotification (league, lastMatch) {
     const redTeam = lastMatch.teams[0].map(p => league.players[p])
     const blueTeam = lastMatch.teams[1].map(p => league.players[p])
     const lastPlayers = redTeam.concat(blueTeam)
     const listItems = lastPlayers.map(p => p.getPostMatchString()).join('</li><li>')
     const list = `<ul><li>${listItems}</li></ul>`
-    const greeting = redScore === blueScore
+    const greeting = lastMatch.scores[0] === lastMatch.scores[1]
       ? '(wow) A draw!?!?'
-      : `Congratulations ${redScore > blueScore ? getTeamName('Red', redTeam) : getTeamName('Blue', blueTeam)}!`
+      : `Congratulations ${lastMatch.scores[0] > lastMatch.scores[1] ? getTeamName('Red', redTeam) : getTeamName('Blue', blueTeam)}!`
     return notification.green.html(`${greeting} Let's see how that changes your stats: ${list}`)
   }
 }
