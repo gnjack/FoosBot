@@ -1,5 +1,6 @@
 import test from '../test'
 import sinon from 'sinon'
+import moment from 'moment'
 import MessageHandler from '.'
 
 const matchHistoryTableName = process.env.matchHistoryTableName = 'matchHistoryTableName'
@@ -122,10 +123,10 @@ for (const command of ['5 10', '5 - 10', 'red 5 blue 10', 'blue 10 red 5']) {
     body.item.message.message = command
     const dbMatches = {
       Items: [
-        { id: 'match#1', teams: [['<xss>'], ['a']], scores: [10, 5] },
-        { id: 'match#2', teams: [['a'], ['b']], scores: [5, 10] },
-        { id: 'match#3', teams: [['a'], ['b']], scores: [5, 10] },
-        { id: 'match#4', teams: [['a'], ['b']] }
+        { id: 'match#1', teams: [['<xss>'], ['a']], scores: [10, 5], time: moment().subtract(1, 'Days').unix() },
+        { id: 'match#2', teams: [['a'], ['b']], scores: [5, 10], time: moment().subtract(1, 'Days').unix() },
+        { id: 'match#3', teams: [['a'], ['b']], scores: [5, 10], time: moment().unix() },
+        { id: 'match#4', teams: [['a'], ['b']], time: moment().unix() }
       ]
     }
     db.query.withArgs(sinon.match({ TableName: matchHistoryTableName })).returns({ promise: () => dbMatches })
@@ -143,7 +144,7 @@ for (const command of ['5 10', '5 - 10', 'red 5 blue 10', 'blue 10 red 5']) {
     })
     let expected = `Congratulations B! Let's see how that changes your stats: `
     expected += `<ul><li>A Name - skill level -1.1 (+0.2) ranked 3rd (+0)</li><li>B Name - skill level 12.5 (+2.2) ranked 1st (+0)</li></ul>`
-    expected += `A Name is on a personal low, losing 4 matches in a row<br>B Name is on a personal best win streak of 3 matches in a row!`
+    expected += `A Name is on a personal low, losing 4 matches in a row<br>B Name is on a personal best win streak of 3 matches in a row!<br>B Name - Double kill! (2 match win streak today)<br>B Name - Killing Spree! (3 match win streak)`
     t.htmlResponse(response, expected)
     t.end()
   })

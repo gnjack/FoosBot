@@ -1,5 +1,6 @@
 import { Player as TSPlayer } from 'jstrueskill'
 import antiXSS from './antiXSS'
+import moment from 'moment'
 
 export default class Player extends TSPlayer {
   constructor (name, rating) {
@@ -9,6 +10,7 @@ export default class Player extends TSPlayer {
     this.won = 0
     this.lost = 0
     this.streak = 0
+    this.streakToday = 0
     this.bestStreak = 0
     this.worstStreak = 0
     this.flawlessVictories = 0
@@ -52,10 +54,16 @@ export default class Player extends TSPlayer {
       this.won ++
       this.streak = Math.max(1, this.streak + 1)
       this.bestStreak = Math.max(this.bestStreak, this.streak)
+      if (match.time.isSame(moment(), 'day')) {
+        this.streakToday = Math.max(1, this.streakToday + 1)
+      }
     } else if (oppScore > myScore) {
       this.lost ++
       this.streak = Math.min(-1, this.streak - 1)
       this.worstStreak = Math.min(this.worstStreak, this.streak)
+      if (match.time.isSame(moment(), 'day')) {
+        this.streakToday = Math.min(-1, this.streakToday - 1)
+      }
     }
   }
 
@@ -72,6 +80,12 @@ export default class Player extends TSPlayer {
     }
     if (this._prevRank && this._prevRank <= 3 && this._rank > this._prevRank) {
       events.push(`${antiXSS(this.getId())} falls from ${getOrdinal(this._prevRank)} place on the podium to ${getOrdinal(this._rank)}, allowing ${antiXSS(league.leaderboard[this._prevRank - 1].getId())} to climb to ${getOrdinal(this._prevRank)}`)
+    }
+    if (this.streakToday > 1) {
+      events.push(`${antiXSS(this.getId())} - ${dotaMultiKill(this.streakToday)}! (${this.streakToday} match win streak today)`)
+    }
+    if (this.streak > 2) {
+      events.push(`${antiXSS(this.getId())} - ${dotaKillStreak(this.streak)}! (${this.streak} match win streak)`)
     }
     return events
   }
@@ -114,4 +128,42 @@ function getOrdinal (n) {
   const s = ['th', 'st', 'nd', 'rd']
   const v = n % 100
   return n + (s[(v - 20) % 10] || s[v] || s[0])
+}
+
+function dotaMultiKill (n) {
+  switch (n) {
+    case 2:
+      return 'Double kill'
+    case 3:
+      return 'Triple kill'
+    case 4:
+      return 'Ultra kill'
+    case (n >= 5):
+      return 'Rampage'
+    default:
+      return null
+  }
+}
+
+function dotaKillStreak (n) {
+  switch (n) {
+    case 3:
+      return 'Killing Spree'
+    case 4:
+      return 'Dominating'
+    case 5:
+      return 'Mega Kill'
+    case 6:
+      return 'Unstoppable'
+    case 7:
+      return 'Wicked Sick'
+    case 8:
+      return 'M-M-M-Monster Kill'
+    case 9:
+      return 'Godlike'
+    case (n >= 10):
+      return 'Beyond Godlike'
+    default:
+      return null
+  }
 }
