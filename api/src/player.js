@@ -5,9 +5,13 @@ export default class Player extends TSPlayer {
   constructor (name, rating) {
     super(name)
     this._rating = rating
-    this.matches = 0
+    this._matches = 0
     this.won = 0
     this.lost = 0
+    this.for = 0
+    this.against = 0
+    this.winDif = 0
+    this.lostDif = 0
     this.streak = 0
     this.bestStreak = 0
     this.worstStreak = 0
@@ -15,8 +19,16 @@ export default class Player extends TSPlayer {
     this.flawlessDefeats = 0
   }
 
-  get played () {
-    return this.won + this.lost
+  set matches (val) {
+    this._matches = val
+  }
+
+  get matches () {
+    return this._matches
+  }
+
+  get idString () {
+    return antiXSS(this.getId())
   }
 
   get rating () {
@@ -41,6 +53,8 @@ export default class Player extends TSPlayer {
     const red = redTeam.getPlayers().some(p => p === this)
     const myScore = red ? match.scores[0] : match.scores[1]
     const oppScore = red ? match.scores[1] : match.scores[0]
+    this.for = myScore + this.for
+    this.against = oppScore + this.against
 
     this.matches ++
     if (oppScore === 0 && myScore >= 10) {
@@ -50,24 +64,39 @@ export default class Player extends TSPlayer {
     }
     if (myScore > oppScore) {
       this.won ++
+      this.winDif = (myScore - oppScore) + this.winDif
       this.streak = Math.max(1, this.streak + 1)
       this.bestStreak = Math.max(this.bestStreak, this.streak)
     } else if (oppScore > myScore) {
       this.lost ++
+      this.lostDif = (oppScore - myScore) + this.lostDif
       this.streak = Math.min(-1, this.streak - 1)
       this.worstStreak = Math.min(this.worstStreak, this.streak)
     }
   }
 
-  getLeaderboardString (includeRating = true) {
-    if (includeRating) {
-      return `${antiXSS(this.getId())} (${this.getRatingString()})${this.flawlessVictories ? ' ' + '🔥'.repeat(this.flawlessVictories) : ''}${this.flawlessDefeats ? ' ' + '💩'.repeat(this.flawlessDefeats) : ''}`
-    }
-    return `${antiXSS(this.getId())}`
+  getLeaderboardString () {
+    var playerRow = []
+    playerRow.push(
+      `<tr>`,
+      `<td>${this.rank}</td>`,
+      `<td>${this.idString}</td>`,
+      `<td>${this.getRatingString()}</td>`,
+      `<td>${this.matches}</td>`,
+      `<td>${this.won}</td>`,
+      `<td>${this.lost}</td>`,
+      `<td>${this.for}</td>`,
+      `<td>${this.against}</td>`,
+      `<td>${(this.winDif / this.matches).toFixed(1)}</td>`,
+      `<td>${(this.lostDif / this.matches).toFixed(1)}</td>`,
+      `<td>${this.flawlessVictories ? '🔥'.repeat(this.flawlessVictories) : ''}${this.flawlessDefeats ? ' ' + '💩'.repeat(this.flawlessDefeats) : ''}</td>`,
+      `</tr>`
+    )
+    return playerRow.join('')
   }
 
   getPostMatchString () {
-    return `${antiXSS(this.getId())} - skill level ${this.getRatingString()} (${this.getRatingDeltaString()}) ranked ${this.getRankString()} (${this.getRankDeltaString()})`
+    return `${this.idString} - skill level ${this.getRatingString()} (${this.getRatingDeltaString()}) ranked ${this.getRankString()} (${this.getRankDeltaString()})`
   }
 
   getRatingString (precision = 1) {

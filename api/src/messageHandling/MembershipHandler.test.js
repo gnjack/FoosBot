@@ -164,26 +164,7 @@ test('MembershipHandler # list all members', async t => {
   const response = await messageHandler.handle(installation, body)
 
   t.notCalled(db.update)
-  t.htmlResponse(response, `Table football leaderboard, sorted by skill level: <ol><li>&lt;XSS&gt; (11.7) 🔥🔥</li><li>A (-0.8) 💩💩</li></ol>`)
-  t.end()
-})
-
-test('MembershipHandler # list all members, with no match players', async t => {
-  setupHandler()
-  installation.rooms[roomId] = { members: { '<xss>': '<XSS>', a: 'A', b: 'B' } }
-  body.item.message.message = 'LIST'
-  const dbMatches = {
-    Items: [
-      { id: 'match#1', teams: [['<xss>'], ['a']], scores: [10, 0], time: moment().unix() },
-      { id: 'match#2', teams: [['<xss>'], ['a']], scores: [10, 0], time: moment().unix() }
-    ]
-  }
-  db.query.withArgs(sinon.match({ TableName: matchHistoryTableName })).returns({ promise: () => dbMatches })
-
-  const response = await messageHandler.handle(installation, body)
-
-  t.notCalled(db.update)
-  t.htmlResponse(response, `Table football leaderboard, sorted by skill level: <ol><li>&lt;XSS&gt; (11.7) 🔥🔥</li><li>A (-0.8) 💩💩</li></ol></br>The following players have not played a game: <ol><li>B</li></ol>`)
+  t.htmlResponse(response, `Table football leaderboard, sorted by skill level: <table><tr><td><em>|Rank</em></td><td><em>|Player</em></td><td><em>|Skill Level</em></td><td><em>|Played</em></td><td><em>|Won</em></td><td><em>|Lost</em></td><td><em>|Goals For</em></td><td><em>|Goals Against</em></td><td><em>|Avg. Win Dif</em></td><td><em>|Avg. Lost Dif</em></td><td><em>|Achievements</em></td></tr><tr><td>1</td><td>&lt;XSS&gt;</td><td>11.7</td><td>2</td><td>2</td><td>0</td><td>20</td><td>0</td><td>10.0</td><td>0.0</td><td>🔥🔥</td></tr>,<tr><td>2</td><td>A</td><td>-0.8</td><td>2</td><td>0</td><td>2</td><td>0</td><td>20</td><td>0.0</td><td>10.0</td><td> 💩💩</td></tr></table>`)
   t.end()
 })
 
@@ -203,7 +184,7 @@ test('MembershipHandler # list all members within last 30 days', async t => {
   const response = await messageHandler.handle(installation, body)
 
   t.notCalled(db.update)
-  t.htmlResponse(response, `Table football leaderboard, sorted by skill level for the last 30 days: <ol><li>&lt;XSS&gt; (7.9) 🔥</li><li>A (-0.9) 💩</li></ol>`)
+  t.htmlResponse(response, `Table football leaderboard, sorted by skill level for the last 30 days: <table><tr><td><em>|Rank</em></td><td><em>|Player</em></td><td><em>|Skill Level</em></td><td><em>|Played</em></td><td><em>|Won</em></td><td><em>|Lost</em></td><td><em>|Goals For</em></td><td><em>|Goals Against</em></td><td><em>|Avg. Win Dif</em></td><td><em>|Avg. Lost Dif</em></td><td><em>|Achievements</em></td></tr><tr><td>1</td><td>&lt;XSS&gt;</td><td>7.9</td><td>1</td><td>1</td><td>0</td><td>10</td><td>0</td><td>10.0</td><td>0.0</td><td>🔥</td></tr>,<tr><td>2</td><td>A</td><td>-0.9</td><td>1</td><td>0</td><td>1</td><td>0</td><td>10</td><td>0.0</td><td>10.0</td><td> 💩</td></tr></table>`)
   t.end()
 })
 
