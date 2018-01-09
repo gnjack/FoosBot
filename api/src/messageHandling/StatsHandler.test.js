@@ -11,7 +11,8 @@ const exampleHistory = {
     { id: 'match#1', teams: [['my name'], ['<xss>']], scores: [10, 5] },
     { id: 'match#2', teams: [['my name'], ['<xss>']], scores: [10, 0] },
     { id: 'match#3', teams: [['my name'], ['a']], scores: [0, 10] },
-    { id: 'match#4', teams: [['my name'], ['b']], scores: [10, 0] }
+    { id: 'match#4', teams: [['my name', 'a'], ['b', '<xss>']], scores: [10, 0] },
+    { id: 'match#5', teams: [['my name'], ['a', 'b', '<xss>']], scores: [5, 10] }
   ]
 }
 
@@ -50,12 +51,30 @@ for (const command of ['my stats ', ' stats My Name', 'stats me']) {
     const response = await messageHandler.handle(installation, body)
 
     t.htmlResponse(response, `Player stats for My Name: <ul>
-<li>Skill level 13.106, ranked 1st. (μ 29.1, σ 5.3)</li>
-<li>Played 4 matches. Won 3. Lost 1.</li>
+<li>Skill level 10.831, ranked 2nd. (μ 27.7, σ 5.6)</li>
+<li>Played 5 matches. Won 3. Lost 2.</li>
 <li>Longest win streak: 2</li>
 <li>Longest lose streak: 1</li>
 <li>Flawless victories: 2</li>
 <li>Laps of shame: 1</li>
+</ul>`)
+    t.end()
+  })
+}
+
+for (const command of [' stats ', 'global stats']) {
+  test('StatsHandler # get global stats using ' + command, async t => {
+    setupHandler()
+    body.item.message.message = command
+    db.query.withArgs(sinon.match({ TableName: matchHistoryTableName })).returns({ promise: () => exampleHistory })
+
+    const response = await messageHandler.handle(installation, body)
+
+    t.htmlResponse(response, `Global stats: <ul>
+<li>4 competitors</li>
+<li>5 matches played</li>
+<li>60 goals scored</li>
+<li>FoosBot has predicted 80.0% of matches correctly</li>
 </ul>`)
     t.end()
   })
@@ -70,12 +89,12 @@ test('StatsHandler # get stats using mention', async t => {
   const response = await messageHandler.handle(installation, body)
 
   t.htmlResponse(response, `Player stats for &lt;XSS&gt;: <ul>
-<li>Skill level -0.800, ranked 4th. (μ 18.8, σ 6.5)</li>
-<li>Played 2 matches. Won 0. Lost 2.</li>
-<li>Longest win streak: 0</li>
-<li>Longest lose streak: 2</li>
+<li>Skill level -0.978, ranked 4th. (μ 17.9, σ 6.3)</li>
+<li>Played 4 matches. Won 1. Lost 3.</li>
+<li>Longest win streak: 1</li>
+<li>Longest lose streak: 3</li>
 <li>Flawless victories: 0</li>
-<li>Laps of shame: 1</li>
+<li>Laps of shame: 2</li>
 </ul>`)
   t.end()
 })

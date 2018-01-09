@@ -10,22 +10,24 @@ export default class MatchHandler {
   }
 
   async handle ({installation, body, message}) {
-    const room = installation.rooms[body.item.room.id]
+    const roomId = body.item.room.id
+    const room = installation.rooms[roomId]
+    const members = (room && room.members) || {}
 
-    const name = message.message.split('stats').map(s => s.trim()).filter(s => s).join('')
-    return this._playerStats(room, body, normalizeName(name, message))
+    const name = normalizeName(message.message.split('stats').map(s => s.trim()).filter(s => s).join(''), message)
+    return !name || name === 'global'
+      ? this._globalStats(roomId, members)
+      : this._playerStats(roomId, members, name)
   }
 
-  async _playerStats (room, body, playerName) {
-    const members = (room && room.members) || {}
+  async _playerStats (roomId, members, playerName) {
     if (!nameKnown(playerName, members)) {
       return notification.yellow.text(`Sorry, I don't know who ${playerName} is.`)
     }
 
-    const roomId = body.item.room.id
     const matches = await new QueryMatchesCommand(this._db).execute({ roomId })
 
-    const league = new League(room.members)
+    const league = new League(members)
     league.runLeague(matches)
 
     const player = league.players[playerName]
@@ -38,6 +40,20 @@ export default class MatchHandler {
 <li>Laps of shame: ${player.flawlessDefeats}</li>
 </ul>`
     return notification.gray.html(`Player stats for ${antiXSS(player.getId())}: ${list}`)
+  }
+
+  async _globalStats (roomId, members) {
+    const matches = await new QueryMatchesCommand(this._db).execute({ roomId })
+
+    const league = new League(members)
+    league.runLeague(matches)
+
+    return notification.gray.html(`Global stats: <ul>
+<li>${Object.keys(members).length} competitors</li>
+<li>${league.stats.matchesCompleted} matches played</li>
+<li>${league.stats.goals} goals scored</li>
+<li>${process.env.addonName} has predicted ${(100 * league.stats.correctlyPredicted / league.stats.matchesCompleted).toFixed(1)}% of matches correctly</li>
+</ul>`)
   }
 }
 

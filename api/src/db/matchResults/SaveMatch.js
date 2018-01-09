@@ -6,11 +6,11 @@ export default class SaveMatch {
   }
 
   async execute (match) {
-    match.time = moment().unix()
+    match.time = moment()
     match.id = createId()
     await this._db.put({
       TableName: process.env.matchHistoryTableName,
-      Item: match
+      Item: { ...match, time: match.time.unix() }
     }).promise()
   }
 }
