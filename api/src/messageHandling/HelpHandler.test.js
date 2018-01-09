@@ -51,6 +51,7 @@ for (const command of ['help', 'hi @FoosBot']) {
 <li><b>red <i>&lt;score&gt;</i> blue <i>&lt;score&gt;</i></b> or <b><i>&lt;red score&gt;</i> <i>&lt;blue score&gt;</i></b> - record the results of current match</li>
 <li><b>cancel</b> - cancel current match</li>
 <li><b><i>&lt;competitor&gt;</i> stats</b> - show detailed stats for a player</li>
+<li><b>[global] stats</b> - show stats for the entire league</li>
 </ul>`
     t.htmlResponse(response, expected)
     t.end()

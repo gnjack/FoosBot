@@ -14,8 +14,10 @@ export default class MatchHandler {
     const room = installation.rooms[roomId]
     const members = (room && room.members) || {}
 
-    const name = message.message.split('stats').map(s => s.trim()).filter(s => s).join('')
-    return this._playerStats(roomId, members, normalizeName(name, message))
+    const name = normalizeName(message.message.split('stats').map(s => s.trim()).filter(s => s).join(''), message)
+    return !name || name === 'global'
+      ? this._globalStats(roomId, members)
+      : this._playerStats(roomId, members, name)
   }
 
   async _playerStats (roomId, members, playerName) {
@@ -38,6 +40,20 @@ export default class MatchHandler {
 <li>Laps of shame: ${player.flawlessDefeats}</li>
 </ul>`
     return notification.gray.html(`Player stats for ${antiXSS(player.getId())}: ${list}`)
+  }
+
+  async _globalStats (roomId, members) {
+    const matches = await new QueryMatchesCommand(this._db).execute({ roomId })
+
+    const league = new League(members)
+    league.runLeague(matches)
+
+    return notification.gray.html(`Global stats: <ul>
+<li>${Object.keys(members).length} competitors</li>
+<li>${league.stats.matchesCompleted} matches played</li>
+<li>${league.stats.goals} goals scored</li>
+<li>${process.env.addonName} has predicted ${(100 * league.stats.correctlyPredicted / league.stats.matchesCompleted).toFixed(1)}% of matches correctly</li>
+</ul>`)
   }
 }
 
