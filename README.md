@@ -21,7 +21,7 @@ It will create a full API pipeline in AWS, with seperate test and stable endpoin
 
 * Navigate to the `/api` folder
 * Run `yarn --ignore-engines install`  
-  `--ignore-engines` is required as `jstrueskill` is incorrectly pinning to only support a specific node and npm version*
+  *`--ignore-engines` is required as `jstrueskill` is incorrectly pinning to only support a specific node and npm version*
 * Now you can `yarn build` which will lint, test and compile your code
 
 ## AWS Setup
@@ -40,7 +40,7 @@ It will create a full API pipeline in AWS, with seperate test and stable endpoin
 
 ## Adding integration to a Room
 
-When you `yarn deploy` or `yarn promote` Claudia JS will be return the URL to access the latest or stable version of your FoosBot API. Copy this url and add `/descriptor` to the end. Now navigate to the HipChat room, select 'Integrations' on the menu option and follow steps below:
+When you `yarn deploy` or `yarn promote` Claudia JS will return the URL to access the latest or stable version of your FoosBot API. Copy this url and add `/descriptor` to the end. Now navigate to the HipChat room, select 'Integrations' on the menu option and follow steps below:
 
 * Click 'Install new integration' (must be room admin)
 * 'Build your own Integration'
