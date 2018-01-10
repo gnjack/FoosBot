@@ -9,6 +9,8 @@ export default class Player extends TSPlayer {
     this._matches = 0
     this._won = 0
     this.lost = 0
+    this.winDif = 0
+    this.lostDif = 0
     this._streak = 0
     this._streakToday = 0
     this.bestStreak = 0
@@ -69,6 +71,14 @@ export default class Player extends TSPlayer {
 
   set goalsConceded (val) {
     this._goalsConceded = val
+  }
+
+  get avgWinDiff () {
+    return (this.won === 0 ? 0 : this.winDif / this.won).toFixed(1)
+  }
+
+  get avgLostDiff () {
+    return (this.lost === 0 ? 0 : this.lostDif / this.lost).toFixed(1)
   }
 
   get matches () {
@@ -170,6 +180,7 @@ export default class Player extends TSPlayer {
     }
     if (myScore > oppScore) {
       this.won ++
+      this.winDif = (myScore - oppScore) + this.winDif
       this.streak = Math.max(1, this.streak + 1)
       this.bestStreak = Math.max(this.bestStreak, this.streak)
       if (match.time.isSame(moment(), 'day')) {
@@ -177,6 +188,7 @@ export default class Player extends TSPlayer {
       }
     } else if (oppScore > myScore) {
       this.lost ++
+      this.lostDif = (oppScore - myScore) + this.lostDif
       this.streak = Math.min(-1, this.streak - 1)
       this.worstStreak = Math.min(this.worstStreak, this.streak)
       if (match.time.isSame(moment(), 'day')) {
@@ -220,6 +232,26 @@ export default class Player extends TSPlayer {
       return `${antiXSS(this.getId())} (${this.getRatingString()})${this.flawlessVictories ? ' ' + '🔥'.repeat(this.flawlessVictories) : ''}${this.flawlessDefeats ? ' ' + '💩'.repeat(this.flawlessDefeats) : ''}`
     }
     return `${antiXSS(this.getId())}`
+  }
+
+  getVerboseLeaderboard () {
+    var playerRow = []
+    playerRow.push(
+      `<tr>`,
+      `<td>${this.rank}.</td>`,
+      `<td>${antiXSS(this.getId())}</td>`,
+      `<td>${this.getRatingString()}</td>`,
+      `<td>${this.matches}</td>`,
+      `<td>${this.won}</td>`,
+      `<td>${this.lost}</td>`,
+      `<td>${this.goalsScored}</td>`,
+      `<td>${this.goalsConceded}</td>`,
+      `<td>${this.avgWinDiff}</td>`,
+      `<td>${this.avgLostDiff}</td>`,
+      `<td>${this.flawlessVictories ? ' ' + '🔥'.repeat(this.flawlessVictories) : ''}${this.flawlessDefeats ? ' ' + '💩'.repeat(this.flawlessDefeats) : ''}</td>`,
+      `</tr>`
+    )
+    return playerRow.join('')
   }
 
   getPostMatchString () {

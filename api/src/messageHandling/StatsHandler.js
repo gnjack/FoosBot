@@ -46,7 +46,7 @@ export default class MatchHandler {
 <li>Skill level ${player.getRatingString(3)}, ranked ${player.getRankString()}. ${player.getNormalDistributionString()}</li>
 <li>Played ${player.matches} matches. Won ${player.won}, Lost ${player.lost}, W/L Ratio ${(player.won / player.lost || 1).toFixed(2)}.</li>
 <li>Best win streak: ${player.bestStreak}, Worst lose streak: ${-player.worstStreak}</li>
-<li>${player.goalsScored} goals scored, ${player.goalsConceded} goals conceded</li>
+<li>${player.goalsScored} goals scored, ${player.goalsConceded} goals conceded. (Avg. Diff: Won ${player.avgWinDiff}, Lost ${player.avgLostDiff})</li>
 ${flawlessVictories}${flawlessDefeats}</ul><br />
 Achievements: ${achievements}`
 
