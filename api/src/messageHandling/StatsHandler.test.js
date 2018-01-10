@@ -52,9 +52,9 @@ for (const command of ['my stats ', ' stats My Name', 'stats me']) {
 
     t.htmlResponse(response, `Player stats for My Name: <ul>
 <li>Skill level 10.831, ranked 2nd. (μ 27.7, σ 5.6)</li>
-<li>Played 5 matches. Won 3. Lost 2.</li>
-<li>Longest win streak: 2</li>
-<li>Longest lose streak: 1</li>
+<li>Played 5 matches. Won 3, Lost 2, W/L Ratio 1.50.</li>
+<li>Best win streak: 2, Worst lose streak: 1</li>
+<li>35 goals scored, 25 goals conceded</li>
 <li>Flawless victories: 2</li>
 <li>Laps of shame: 1</li>
 </ul><br />
@@ -91,10 +91,9 @@ test('StatsHandler # get stats using mention', async t => {
 
   t.htmlResponse(response, `Player stats for &lt;XSS&gt;: <ul>
 <li>Skill level -0.978, ranked 4th. (μ 17.9, σ 6.3)</li>
-<li>Played 4 matches. Won 1. Lost 3.</li>
-<li>Longest win streak: 1</li>
-<li>Longest lose streak: 3</li>
-<li>Flawless victories: 0</li>
+<li>Played 4 matches. Won 1, Lost 3, W/L Ratio 0.33.</li>
+<li>Best win streak: 1, Worst lose streak: 3</li>
+<li>15 goals scored, 35 goals conceded</li>
 <li>Laps of shame: 2</li>
 </ul><br />
 Achievements: <ul><li>🚼 - Newbie! (First game played)</li><li>💮 - On the Podium (Reached top 3 in the league)</li></ul>`)

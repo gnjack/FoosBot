@@ -15,7 +15,8 @@ export default class Player extends TSPlayer {
     this.worstStreak = 0
     this._flawlessVictories = 0
     this.flawlessDefeats = 0
-    this._goals = 0
+    this._goalsScored = 0
+    this._goalsConceded = 0
     this._matchesToday = 0
     this.achievements = new Set()
   }
@@ -42,24 +43,32 @@ export default class Player extends TSPlayer {
     this._streakToday = val
   }
 
-  get goals () {
-    return this._goals
+  get goalsScored () {
+    return this._goalsScored
   }
 
-  set goals (val) {
-    this._goals = val
+  set goalsScored (val) {
+    this._goalsScored = val
     if (val >= 5000) {
-      this.achievements.add(`💖 - Absent From Work (5000 goals scored)`)
+      this.achievements.add(`💖 - Absent From Work (5000 goalsScored scored)`)
     }
     if (val >= 1000) {
-      this.achievements.add(`💗 - 1K Goals (1000 goals scored)`)
+      this.achievements.add(`💗 - 1K goalsScored (1000 goalsScored scored)`)
     }
     if (val >= 500) {
-      this.achievements.add(`💓 - Monkey (500 goals scored)`)
+      this.achievements.add(`💓 - Monkey (500 goalsScored scored)`)
     }
     if (val >= 100) {
-      this.achievements.add(`❤ - Century (100 goals scored)`)
+      this.achievements.add(`❤ - Century (100 goalsScored scored)`)
     }
+  }
+
+  get goalsConceded () {
+    return this._goalsConceded
+  }
+
+  set goalsConceded (val) {
+    this._goalsConceded = val
   }
 
   get matches () {
@@ -179,7 +188,8 @@ export default class Player extends TSPlayer {
       this.achievements.add(`😌 - Close Shave (Won by a single goal)`)
     }
 
-    this.goals += myScore
+    this.goalsScored += myScore
+    this.goalsConceded += oppScore
   }
 
   getNotableEvents (league) {
