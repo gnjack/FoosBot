@@ -9,6 +9,10 @@ export default class Player extends TSPlayer {
     this.matches = 0
     this.won = 0
     this.lost = 0
+    this.for = 0
+    this.against = 0
+    this.winDif = 0
+    this.lostDif = 0
     this.streak = 0
     this.streakToday = 0
     this.bestStreak = 0
@@ -43,6 +47,8 @@ export default class Player extends TSPlayer {
     const red = redTeam.getPlayers().some(p => p === this)
     const myScore = red ? match.scores[0] : match.scores[1]
     const oppScore = red ? match.scores[1] : match.scores[0]
+    this.for = myScore + this.for
+    this.against = oppScore + this.against
 
     this.matches ++
     if (oppScore === 0 && myScore >= 10) {
@@ -52,6 +58,7 @@ export default class Player extends TSPlayer {
     }
     if (myScore > oppScore) {
       this.won ++
+      this.winDif = (myScore - oppScore) + this.winDif
       this.streak = Math.max(1, this.streak + 1)
       this.bestStreak = Math.max(this.bestStreak, this.streak)
       if (match.time.isSame(moment(), 'day')) {
@@ -59,12 +66,13 @@ export default class Player extends TSPlayer {
       }
     } else if (oppScore > myScore) {
       this.lost ++
+      this.lostDif = (oppScore - myScore) + this.lostDif
       this.streak = Math.min(-1, this.streak - 1)
       this.worstStreak = Math.min(this.worstStreak, this.streak)
       if (match.time.isSame(moment(), 'day')) {
         this.streakToday = Math.min(-1, this.streakToday - 1)
+      }
     }
-  }
   }
 
   getNotableEvents (league) {
@@ -95,6 +103,26 @@ export default class Player extends TSPlayer {
       return `${antiXSS(this.getId())} (${this.getRatingString()})${this.flawlessVictories ? ' ' + '🔥'.repeat(this.flawlessVictories) : ''}${this.flawlessDefeats ? ' ' + '💩'.repeat(this.flawlessDefeats) : ''}`
     }
     return `${antiXSS(this.getId())}`
+  }
+
+  getVerboseLeaderboard () {
+    var playerRow = []
+    playerRow.push(
+      `<tr>`,
+      `<td>${this.rank}</td>`,
+      `<td>${antiXSS(this.getId())}</td>`,
+      `<td>${this.getRatingString()}</td>`,
+      `<td>${this.matches}</td>`,
+      `<td>${this.won}</td>`,
+      `<td>${this.lost}</td>`,
+      `<td>${this.for}</td>`,
+      `<td>${this.against}</td>`,
+      `<td>${(this.winDif / this.matches).toFixed(1)}</td>`,
+      `<td>${(this.lostDif / this.matches).toFixed(1)}</td>`,
+      `<td>${this.flawlessVictories ? ' ' + '🔥'.repeat(this.flawlessVictories) : ''}${this.flawlessDefeats ? ' ' + '💩'.repeat(this.flawlessDefeats) : ''}</td>`,
+      `</tr>`
+    )
+    return playerRow.join('')
   }
 
   getPostMatchString () {
