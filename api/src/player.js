@@ -5,7 +5,7 @@ import moment from 'moment'
 export default class Player extends TSPlayer {
   constructor (name, rating) {
     super(name)
-    this._rating = rating
+    this.rating = rating
     this._matches = 0
     this._won = 0
     this.lost = 0
