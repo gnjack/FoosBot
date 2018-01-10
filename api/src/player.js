@@ -13,8 +13,6 @@ export default class Player extends TSPlayer {
     this.against = 0
     this.winDif = 0
     this.lostDif = 0
-    this.streak = 0
-    this.streakToday = 0
     this._streak = 0
     this._streakToday = 0
     this.bestStreak = 0
@@ -236,7 +234,7 @@ export default class Player extends TSPlayer {
     var playerRow = []
     playerRow.push(
       `<tr>`,
-      `<td>${this.rank}</td>`,
+      `<td>${this.rank}.</td>`,
       `<td>${antiXSS(this.getId())}</td>`,
       `<td>${this.getRatingString()}</td>`,
       `<td>${this.matches}</td>`,
