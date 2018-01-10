@@ -55,7 +55,7 @@ for (const command of ['my stats ', ' stats My Name', 'stats me']) {
 <li>Skill level 12.912, ranked 2nd. (μ 28.7, σ 5.3)</li>
 <li>Played 6 matches. Won 4, Lost 2, W/L Ratio 2.00.</li>
 <li>Best win streak: 2, Worst lose streak: 1</li>
-<li>45 goals scored, 34 goals conceded</li>
+<li>45 goals scored, 34 goals conceded. (Avg. Diff: Won 6.5, Lost 7.5)</li>
 <li>Flawless victories: 2</li>
 <li>Laps of shame: 1</li>
 </ul><br />
@@ -94,7 +94,7 @@ test('StatsHandler # get stats using mention', async t => {
 <li>Skill level -0.774, ranked 4th. (μ 16.6, σ 5.8)</li>
 <li>Played 5 matches. Won 1, Lost 4, W/L Ratio 0.25.</li>
 <li>Best win streak: 1, Worst lose streak: 3</li>
-<li>24 goals scored, 45 goals conceded</li>
+<li>24 goals scored, 45 goals conceded. (Avg. Diff: Won 5.0, Lost 6.5)</li>
 <li>Laps of shame: 2</li>
 </ul><br />
 Achievements: <ul><li>🚼 - Newbie! (First game played)</li></ul>`)

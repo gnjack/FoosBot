@@ -73,6 +73,14 @@ export default class Player extends TSPlayer {
     this._goalsConceded = val
   }
 
+  get avgWinDiff () {
+    return (this.won === 0 ? 0 : this.winDif / this.won).toFixed(1)
+  }
+
+  get avgLostDiff () {
+    return (this.lost === 0 ? 0 : this.lostDif / this.lost).toFixed(1)
+  }
+
   get matches () {
     return this._matches
   }
@@ -238,8 +246,8 @@ export default class Player extends TSPlayer {
       `<td>${this.lost}</td>`,
       `<td>${this.goalsScored}</td>`,
       `<td>${this.goalsConceded}</td>`,
-      `<td>${(this.winDif / this.matches).toFixed(1)}</td>`,
-      `<td>${(this.lostDif / this.matches).toFixed(1)}</td>`,
+      `<td>${this.avgWinDiff}</td>`,
+      `<td>${this.avgLostDiff}</td>`,
       `<td>${this.flawlessVictories ? ' ' + '🔥'.repeat(this.flawlessVictories) : ''}${this.flawlessDefeats ? ' ' + '💩'.repeat(this.flawlessDefeats) : ''}</td>`,
       `</tr>`
     )
