@@ -57,7 +57,8 @@ for (const command of ['my stats ', ' stats My Name', 'stats me']) {
 <li>Longest lose streak: 1</li>
 <li>Flawless victories: 2</li>
 <li>Laps of shame: 1</li>
-</ul>`)
+</ul><br />
+Achievements: <ul><li>🚼 - Newbie! (First game played)</li><li>👑 - King of the League (Reached 1st Place in the league)</li></ul>`)
     t.end()
   })
 }
@@ -95,7 +96,8 @@ test('StatsHandler # get stats using mention', async t => {
 <li>Longest lose streak: 3</li>
 <li>Flawless victories: 0</li>
 <li>Laps of shame: 2</li>
-</ul>`)
+</ul><br />
+Achievements: <ul><li>🚼 - Newbie! (First game played)</li><li>💮 - On the Podium (Reached top 3 in the league)</li></ul>`)
   t.end()
 })
 

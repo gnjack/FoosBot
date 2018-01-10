@@ -31,6 +31,15 @@ export default class MatchHandler {
     league.runLeague(matches)
 
     const player = league.players[playerName]
+    let achievements = `<ul>`
+    if (player.achievements.size > 0) {
+      for (let achievement of player.achievements) {
+        achievements += `<li>${achievement}</li>`
+      }
+      achievements += `</ul>`
+    } else {
+      achievements = `Keep playing to unlock acheivements!`
+    }
     const list = `<ul>
 <li>Skill level ${player.getRatingString(3)}, ranked ${player.getRankString()}. ${player.getNormalDistributionString()}</li>
 <li>Played ${player.matches} matches. Won ${player.won}. Lost ${player.lost}.</li>
@@ -38,7 +47,9 @@ export default class MatchHandler {
 <li>Longest lose streak: ${-player.worstStreak}</li>
 <li>Flawless victories: ${player.flawlessVictories}</li>
 <li>Laps of shame: ${player.flawlessDefeats}</li>
-</ul>`
+</ul><br />
+Achievements: ${achievements}`
+
     return notification.gray.html(`Player stats for ${antiXSS(player.getId())}: ${list}`)
   }
 
