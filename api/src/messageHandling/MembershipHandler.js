@@ -78,7 +78,7 @@ export default class MembershipHandler {
       league.runLeague(matches)
       const listItems = league.leaderboard.filter(p => p.played > 0).map(p => p.getVerboseLeaderboard())
       const tableHeaders = '<tr><td><em>|Rank</em></td><td><em>|Player</em></td><td><em>|Skill Level</em></td><td><em>|Played</em></td><td><em>|Won</em></td>' +
-      '<td><em>|Lost</em></td><td><em>|Goals For</em></td><td><em>|Goals Against</em></td><td><em>|Avg. Win Dif</em></td><td><em>|Avg. Lost Dif</em></td>' +
+      '<td><em>|Lost</em></td><td><em>|Goals Scored</em></td><td><em>|Goals Conceded</em></td><td><em>|Avg. Win Dif</em></td><td><em>|Avg. Lost Dif</em></td>' +
       '<td><em>|Achievements</em></td></tr>'
       const list = `<table>${tableHeaders + listItems}</table>`
       return notification.gray.html(`Table football leaderboard, sorted by skill level: ${list}`)

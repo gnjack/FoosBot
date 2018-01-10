@@ -164,7 +164,7 @@ test('MembershipHandler # list-table all members', async t => {
   const response = await messageHandler.handle(installation, body)
 
   t.notCalled(db.update)
-  t.htmlResponse(response, `Table football leaderboard, sorted by skill level: <table><tr><td><em>|Rank</em></td><td><em>|Player</em></td><td><em>|Skill Level</em></td><td><em>|Played</em></td><td><em>|Won</em></td><td><em>|Lost</em></td><td><em>|Goals For</em></td><td><em>|Goals Against</em></td><td><em>|Avg. Win Dif</em></td><td><em>|Avg. Lost Dif</em></td><td><em>|Achievements</em></td></tr><tr><td>1.</td><td>&lt;XSS&gt;</td><td>11.7</td><td>2</td><td>2</td><td>0</td><td>20</td><td>0</td><td>10.0</td><td>0.0</td><td> 🔥🔥</td></tr>,<tr><td>2.</td><td>A</td><td>-0.8</td><td>2</td><td>0</td><td>2</td><td>0</td><td>20</td><td>0.0</td><td>10.0</td><td> 💩💩</td></tr></table>`)
+  t.htmlResponse(response, `Table football leaderboard, sorted by skill level: <table><tr><td><em>|Rank</em></td><td><em>|Player</em></td><td><em>|Skill Level</em></td><td><em>|Played</em></td><td><em>|Won</em></td><td><em>|Lost</em></td><td><em>|Goals Scored</em></td><td><em>|Goals Conceded</em></td><td><em>|Avg. Win Dif</em></td><td><em>|Avg. Lost Dif</em></td><td><em>|Achievements</em></td></tr><tr><td>1.</td><td>&lt;XSS&gt;</td><td>11.7</td><td>2</td><td>2</td><td>0</td><td>20</td><td>0</td><td>10.0</td><td>0.0</td><td> 🔥🔥</td></tr>,<tr><td>2.</td><td>A</td><td>-0.8</td><td>2</td><td>0</td><td>2</td><td>0</td><td>20</td><td>0.0</td><td>10.0</td><td> 💩💩</td></tr></table>`)
   t.end()
 })
 

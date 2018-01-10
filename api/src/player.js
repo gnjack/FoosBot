@@ -9,8 +9,6 @@ export default class Player extends TSPlayer {
     this._matches = 0
     this._won = 0
     this.lost = 0
-    this.for = 0
-    this.against = 0
     this.winDif = 0
     this.lostDif = 0
     this._streak = 0
@@ -165,8 +163,6 @@ export default class Player extends TSPlayer {
     const red = redTeam.getPlayers().some(p => p === this)
     const myScore = red ? match.scores[0] : match.scores[1]
     const oppScore = red ? match.scores[1] : match.scores[0]
-    this.for = myScore + this.for
-    this.against = oppScore + this.against
 
     this.matches ++
     if (oppScore === 0 && myScore >= 10) {
@@ -240,8 +236,8 @@ export default class Player extends TSPlayer {
       `<td>${this.matches}</td>`,
       `<td>${this.won}</td>`,
       `<td>${this.lost}</td>`,
-      `<td>${this.for}</td>`,
-      `<td>${this.against}</td>`,
+      `<td>${this.goalsScored}</td>`,
+      `<td>${this.goalsConceded}</td>`,
       `<td>${(this.winDif / this.matches).toFixed(1)}</td>`,
       `<td>${(this.lostDif / this.matches).toFixed(1)}</td>`,
       `<td>${this.flawlessVictories ? ' ' + '🔥'.repeat(this.flawlessVictories) : ''}${this.flawlessDefeats ? ' ' + '💩'.repeat(this.flawlessDefeats) : ''}</td>`,
