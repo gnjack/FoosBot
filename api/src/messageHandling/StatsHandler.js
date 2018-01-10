@@ -63,7 +63,7 @@ Achievements: ${achievements}`
 <li>${Object.keys(members).length} competitors</li>
 <li>${league.stats.matchesCompleted} matches played</li>
 <li>${league.stats.goals} goals scored</li>
-<li>${process.env.addonName} has predicted ${(100 * league.stats.correctlyPredicted / league.stats.matchesCompleted).toFixed(1)}% of matches correctly</li>
+<li>${process.env.addonName} has predicted ${(100 * league.stats.correctlyPredictedExperienced / (league.stats.experiencedMatches || 1)).toFixed(1)}% of matches without new players correctly (${(100 * league.stats.correctlyPredicted / league.stats.matchesCompleted).toFixed(1)}% overall)</li>
 </ul>`)
   }
 }
