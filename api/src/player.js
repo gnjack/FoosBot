@@ -50,16 +50,16 @@ export default class Player extends TSPlayer {
   set goalsScored (val) {
     this._goalsScored = val
     if (val >= 5000) {
-      this.achievements.add(`💖 - Absent From Work (5000 goalsScored scored)`)
+      this.achievements.add(`💖 - Absent From Work (5000 goals scored)`)
     }
     if (val >= 1000) {
-      this.achievements.add(`💗 - 1K goalsScored (1000 goalsScored scored)`)
+      this.achievements.add(`💗 - 1K goals (1000 goals scored)`)
     }
     if (val >= 500) {
-      this.achievements.add(`💓 - Monkey (500 goalsScored scored)`)
+      this.achievements.add(`💓 - Monkey (500 goals scored)`)
     }
     if (val >= 100) {
-      this.achievements.add(`❤ - Century (100 goalsScored scored)`)
+      this.achievements.add(`❤ - Century (100 goals scored)`)
     }
   }
 
