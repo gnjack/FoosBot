@@ -6,8 +6,8 @@ export default class Player extends TSPlayer {
   constructor (name, rating) {
     super(name)
     this._rating = rating
-    this.matches = 0
-    this.won = 0
+    this._matches = 0
+    this._won = 0
     this.lost = 0
     this.for = 0
     this.against = 0
@@ -15,10 +15,114 @@ export default class Player extends TSPlayer {
     this.lostDif = 0
     this.streak = 0
     this.streakToday = 0
+    this._streak = 0
+    this._streakToday = 0
     this.bestStreak = 0
     this.worstStreak = 0
-    this.flawlessVictories = 0
+    this._flawlessVictories = 0
     this.flawlessDefeats = 0
+    this._goalsScored = 0
+    this._goalsConceded = 0
+    this._matchesToday = 0
+    this.achievements = new Set()
+  }
+
+  get won () {
+    return this._won
+  }
+
+  set won (val) {
+    this._won = val
+    if (val > 1000) {
+      this.achievements.add(`🎂 - 1K Victories (1000 games won))`)
+    }
+    if (val > 100) {
+      this.achievements.add(`🍩 - Victory March (100 games won))`)
+    }
+  }
+
+  get streakToday () {
+    return this._streakToday
+  }
+
+  set streakToday (val) {
+    this._streakToday = val
+  }
+
+  get goalsScored () {
+    return this._goalsScored
+  }
+
+  set goalsScored (val) {
+    this._goalsScored = val
+    if (val >= 5000) {
+      this.achievements.add(`💖 - Absent From Work (5000 goals scored)`)
+    }
+    if (val >= 1000) {
+      this.achievements.add(`💗 - 1K goals (1000 goals scored)`)
+    }
+    if (val >= 500) {
+      this.achievements.add(`💓 - Monkey (500 goals scored)`)
+    }
+    if (val >= 100) {
+      this.achievements.add(`❤ - Century (100 goals scored)`)
+    }
+  }
+
+  get goalsConceded () {
+    return this._goalsConceded
+  }
+
+  set goalsConceded (val) {
+    this._goalsConceded = val
+  }
+
+  get matches () {
+    return this._matches
+  }
+
+  set matches (val) {
+    this._matches = val
+    if (val >= 500) {
+      this.achievements.add(`🙉 - P45 Imminent (500 games played)`)
+    }
+    if (val >= 100) {
+      this.achievements.add(`🙈 - NVM's Lost Millions (100 games played)`)
+    }
+    if (val >= 50) {
+      this.achievements.add(`😫 - Slacker (50 games played)`)
+    }
+    if (val >= 1) {
+      this.achievements.add(`🚼 - Newbie! (First game played)`)
+    }
+  }
+
+  get flawlessVictories () {
+    return this._flawlessVictories
+  }
+
+  set flawlessVictories (val) {
+    this._flawlessVictories = val
+    if (val >= 5) {
+      this.achievements.add(`😈 - Bully (Ten - nilled 5 opponents)`)
+    }
+  }
+
+  get streak () {
+    return this._streak
+  }
+
+  set streak (val) {
+    if (val >= 20) {
+      this.achievements.add(`┌∩┐(◕◡◉)┌∩┐ Unstoppable - (Won 20 games in a row)`)
+    }
+    if (val >= 10) {
+      this.achievements.add(`🐘 - Juggernaut (Won 10 games in a row)`)
+    }
+    if (val >= 5) {
+      this.achievements.add(`🎢 - On A Roll (Won 5 games in a row)`)
+    }
+    this._streak = val
   }
 
   get played () {
@@ -32,6 +136,15 @@ export default class Player extends TSPlayer {
   set rating (val) {
     this._prevRating = this._rating
     this._rating = val
+    if (this._rating >= 40) {
+      this.achievements.add(`💰 - Legend (Achieved a rating of 40)`)
+    }
+    if (this._rating >= 30) {
+      this.achievements.add(`🍺 - Pro (Achieved a rating of 30)`)
+    }
+    if (this._rating >= 20) {
+      this.achievements.add(`👌 - Expert (Achieved a rating of 20)`)
+    }
   }
 
   get rank () {
@@ -41,6 +154,13 @@ export default class Player extends TSPlayer {
   set rank (val) {
     this._prevRank = this._rank
     this._rank = val
+
+    if (this._rank === 1) {
+      this.achievements.add(`👑 - King of the League (Reached 1st Place in the league)`)
+    }
+    if (this._rank <= 3) {
+      this.achievements.add(`💮 - On the Podium (Reached top 3 in the league)`)
+    }
   }
 
   trackMatch (match, redTeam, blueTeam) {
@@ -73,6 +193,13 @@ export default class Player extends TSPlayer {
         this.streakToday = Math.min(-1, this.streakToday - 1)
       }
     }
+
+    if (myScore === (oppScore + 1)) {
+      this.achievements.add(`😌 - Close Shave (Won by a single goal)`)
+    }
+
+    this.goalsScored += myScore
+    this.goalsConceded += oppScore
   }
 
   getNotableEvents (league) {

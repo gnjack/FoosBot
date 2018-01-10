@@ -31,14 +31,25 @@ export default class MatchHandler {
     league.runLeague(matches)
 
     const player = league.players[playerName]
+    let achievements = `<ul>`
+    if (player.achievements.size > 0) {
+      for (let achievement of player.achievements) {
+        achievements += `<li>${achievement}</li>`
+      }
+      achievements += `</ul>`
+    } else {
+      achievements = `Keep playing to unlock acheivements!`
+    }
+    const flawlessVictories = player.flawlessVictories ? `<li>Flawless victories: ${player.flawlessVictories}</li>\n` : ''
+    const flawlessDefeats = player.flawlessDefeats ? `<li>Laps of shame: ${player.flawlessDefeats}</li>\n` : ''
     const list = `<ul>
 <li>Skill level ${player.getRatingString(3)}, ranked ${player.getRankString()}. ${player.getNormalDistributionString()}</li>
-<li>Played ${player.matches} matches. Won ${player.won}. Lost ${player.lost}.</li>
-<li>Longest win streak: ${player.bestStreak}</li>
-<li>Longest lose streak: ${-player.worstStreak}</li>
-<li>Flawless victories: ${player.flawlessVictories}</li>
-<li>Laps of shame: ${player.flawlessDefeats}</li>
-</ul>`
+<li>Played ${player.matches} matches. Won ${player.won}, Lost ${player.lost}, W/L Ratio ${(player.won / player.lost || 1).toFixed(2)}.</li>
+<li>Best win streak: ${player.bestStreak}, Worst lose streak: ${-player.worstStreak}</li>
+<li>${player.goalsScored} goals scored, ${player.goalsConceded} goals conceded</li>
+${flawlessVictories}${flawlessDefeats}</ul><br />
+Achievements: ${achievements}`
+
     return notification.gray.html(`Player stats for ${antiXSS(player.getId())}: ${list}`)
   }
 
@@ -52,7 +63,7 @@ export default class MatchHandler {
 <li>${Object.keys(members).length} competitors</li>
 <li>${league.stats.matchesCompleted} matches played</li>
 <li>${league.stats.goals} goals scored</li>
-<li>${process.env.addonName} has predicted ${(100 * league.stats.correctlyPredicted / league.stats.matchesCompleted).toFixed(1)}% of matches correctly</li>
+<li>${process.env.addonName} has predicted ${(100 * league.stats.correctlyPredictedExperienced / (league.stats.experiencedMatches || 1)).toFixed(1)}% of matches without new players correctly (${(100 * league.stats.correctlyPredicted / league.stats.matchesCompleted).toFixed(1)}% overall)</li>
 </ul>`)
   }
 }

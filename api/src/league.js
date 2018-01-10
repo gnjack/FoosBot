@@ -9,7 +9,9 @@ export default class League {
     this.players = this.createPlayers(members)
     this.stats = {
       matchesCompleted: 0,
+      experiencedMatches: 0,
       correctlyPredicted: 0,
+      correctlyPredictedExperienced: 0,
       goals: 0
     }
   }
@@ -45,20 +47,26 @@ export default class League {
     const red = this.newTeam('Red', match.teams[0].map(k => this.players[k]))
     const blue = this.newTeam('Blue', match.teams[1].map(k => this.players[k]))
     const teams = Team.concat(red, blue)
+    const players = red.players.concat(blue.players)
     const ranks = match.scores.map(s => Math.max(...match.scores) + 1 - s)
     const newRatings = this._calc.calculateNewRatings(this._gameInfo, teams, ranks)
     const teamRatings = teams.map(t => t.players.reduce((r, p) => r + p.rating.conservativeRating, 0))
+    const experiencedMatch = players.every(p => p.matches > 3)
     if ((match.scores[0] >= match.scores[1]) === (teamRatings[0] >= teamRatings[1])) {
       this.stats.correctlyPredicted ++
-    }
-    this.stats.goals += match.scores.reduce((a, b) => a + b, 0)
-    this.stats.matchesCompleted ++
-
-    for (var team of teams) {
-      for (var player of team.getPlayers()) {
-        player.rating = newRatings[player]
-        player.trackMatch(match, red, blue)
+      if (experiencedMatch) {
+        this.stats.correctlyPredictedExperienced ++
       }
+    }
+    if (experiencedMatch) {
+      this.stats.experiencedMatches ++
+    }
+    this.stats.matchesCompleted ++
+    this.stats.goals += match.scores.reduce((a, b) => a + b, 0)
+
+    for (var player of players) {
+      player.rating = newRatings[player]
+      player.trackMatch(match, red, blue)
     }
     const leaderboard = this.leaderboard
     for (var i = 0; i < leaderboard.length; i++) {
