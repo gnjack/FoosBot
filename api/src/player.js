@@ -152,7 +152,7 @@ export default class Player extends TSPlayer {
     if (this._rank === 1) {
       this.achievements.add(`👑 - King of the League (Reached 1st Place in the league)`)
     }
-    if (this._rank >= 3) {
+    if (this._rank <= 3) {
       this.achievements.add(`💮 - On the Podium (Reached top 3 in the league)`)
     }
   }
