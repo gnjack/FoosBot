@@ -264,7 +264,7 @@ export default class Player extends TSPlayer {
 
   getRatingDeltaString () {
     const delta = this._prevRating ? this._rating.conservativeRating - this._prevRating.conservativeRating : 0
-    return (delta < 0 ? '' : '+') + delta.toFixed(1)
+    return (delta < 0 ? '' : '+') + delta.toFixed(2)
   }
 
   getRankString () {

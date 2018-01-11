@@ -143,7 +143,7 @@ for (const command of ['5 10', '5 - 10', 'red 5 blue 10', 'blue 10 red 5']) {
       }
     })
     let expected = `Congratulations B! Let's see how that changes your stats: `
-    expected += `<ul><li>A Name - skill level -1.1 (+0.2) ranked 3rd (+0)</li><li>B Name - skill level 12.5 (+2.2) ranked 1st (+0)</li></ul>`
+    expected += `<ul><li>A Name - skill level -1.1 (+0.16) ranked 3rd (+0)</li><li>B Name - skill level 12.5 (+2.15) ranked 1st (+0)</li></ul>`
     expected += `A Name is on a personal low, losing 4 matches in a row<br>B Name is on a personal best win streak of 3 matches in a row!<br>B Name - Double kill! (2 match win streak today)<br>B Name - Killing Spree! (3 match win streak)`
     t.htmlResponse(response, expected)
     t.end()
@@ -174,7 +174,7 @@ test('MatchHandler # add results - zero red team score', async t => {
     }
   })
   let expected = `Congratulations &lt;XSS&gt;! Let's see how that changes your stats: `
-  expected += `<ul><li>B - skill level -1.6 (-1.6) ranked 3rd (-1)</li><li>&lt;XSS&gt; - skill level 6.3 (+7.2) ranked 2nd (+1)</li></ul>`
+  expected += `<ul><li>B - skill level -1.6 (-1.62) ranked 3rd (-1)</li><li>&lt;XSS&gt; - skill level 6.3 (+7.16) ranked 2nd (+1)</li></ul>`
   expected += `B falls from 2nd place on the podium to 3rd, allowing &lt;XSS&gt; to climb to 2nd<br>&lt;XSS&gt; rises to 2nd place, stealing the spot from B`
   t.htmlResponse(response, expected)
   t.end()
@@ -202,7 +202,7 @@ test('MatchHandler # add results - first match', async t => {
       ':s': [10, 9]
     }
   })
-  t.htmlResponse(response, `Congratulations A! Let's see how that changes your stats: <ul><li>A - skill level 7.9 (+7.9) ranked 1st (+0)</li><li>B - skill level -0.9 (-0.9) ranked 3rd (+0)</li></ul>`)
+  t.htmlResponse(response, `Congratulations A! Let's see how that changes your stats: <ul><li>A - skill level 7.9 (+7.88) ranked 1st (+0)</li><li>B - skill level -0.9 (-0.91) ranked 3rd (+0)</li></ul>`)
   t.end()
 })
 
@@ -228,7 +228,7 @@ test('MatchHandler # adding results when no match in progress updates previous m
       ':s': [10, 9]
     }
   })
-  t.htmlResponse(response, `Congratulations A! Let's see how that changes your stats: <ul><li>A - skill level 7.9 (+7.9) ranked 1st (+0)</li><li>B - skill level -0.9 (-0.9) ranked 3rd (+0)</li></ul>`)
+  t.htmlResponse(response, `Congratulations A! Let's see how that changes your stats: <ul><li>A - skill level 7.9 (+7.88) ranked 1st (+0)</li><li>B - skill level -0.9 (-0.91) ranked 3rd (+0)</li></ul>`)
   t.end()
 })
 
@@ -254,7 +254,7 @@ test('MatchHandler # add results - 3 v 2', async t => {
       ':s': [10, 9]
     }
   })
-  t.htmlResponse(response, `Congratulations Red team! Let's see how that changes your stats: <ul><li>&lt;XSS&gt; - skill level 1.4 (+1.4) ranked 1st (+0)</li><li>A - skill level 1.4 (+1.4) ranked 2nd (+0)</li><li>B - skill level 1.4 (+1.4) ranked 3rd (+0)</li><li>C - skill level -0.1 (-0.1) ranked 4th (+0)</li><li>D - skill level -0.1 (-0.1) ranked 5th (+0)</li></ul>`)
+  t.htmlResponse(response, `Congratulations Red team! Let's see how that changes your stats: <ul><li>&lt;XSS&gt; - skill level 1.4 (+1.42) ranked 1st (+0)</li><li>A - skill level 1.4 (+1.42) ranked 2nd (+0)</li><li>B - skill level 1.4 (+1.42) ranked 3rd (+0)</li><li>C - skill level -0.1 (-0.12) ranked 4th (+0)</li><li>D - skill level -0.1 (-0.12) ranked 5th (+0)</li></ul>`)
   t.end()
 })
 
@@ -283,7 +283,7 @@ for (const command of ['@red vs @blue 5 10', 'Red Player v Blue Player blue 10 r
     })
     t.notCalled(db.update)
     // t.textResponse(response, `Match started! Red - Red Player (-0.9) VS Blue - Blue Player (0.0). Match Quality: 44%`)
-    t.htmlResponse(response, `Congratulations Blue! Let's see how that changes your stats: <ul><li>Red Player - skill level -1.3 (-0.4) ranked 3rd (+0)</li><li>Blue Player - skill level 6.9 (+6.9) ranked 2nd (+0)</li></ul>`)
+    t.htmlResponse(response, `Congratulations Blue! Let's see how that changes your stats: <ul><li>Red Player - skill level -1.3 (-0.44) ranked 3rd (+0)</li><li>Blue Player - skill level 6.9 (+6.86) ranked 2nd (+0)</li></ul>`)
     t.end()
   })
 }
